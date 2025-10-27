@@ -44,9 +44,14 @@
         const appId = 'eDVIR-App-Checklist';
         const statusMessage = document.getElementById('status-message');
 
-        // --- CRITICAL: PASTE YOUR FIREBASE CONFIGURATION HERE ---
-        const firebaseConfig = { /* PASTE YOUR UNIQUE FIREBASE CONFIGURATION KEYS HERE */ }; 
-        // --------------------------------------------------------
+     // --- CRITICAL: PASTE YOUR FIREBASE CONFIGURATION HERE ---
+const firebaseConfig = {
+  apiKey: "AIzaSyCWNSHd6957sh7XWrEZieVYX-a1J4KObAs", // YOUR UNIQUE KEY
+  authDomain: "edvir-tablet-app.firebaseapp.com",
+  projectId: "edvir-tablet-app",
+  // ... rest of your keys
+}; 
+// --------------------------------------------------------
 
         let db, auth, userId = null;
 
@@ -119,3 +124,4 @@
     </script>
 </body>
 </html>
+
