@@ -170,7 +170,14 @@
 
         // Global Variables
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+const firebaseConfig = {
+  apiKey: "AIzaSyCWNSHd6957sh7XWrEZieVYX-a1J4KObAs",
+  authDomain: "edvir-tablet-app.firebaseapp.com",
+  projectId: "edvir-tablet-app",
+  storageBucket: "edvir-tablet-app.firebasestorage.app",
+  messagingSenderId: "189931329843",
+  appId: "1:189931329843:web:78d9884d4c47c0de384646"
+};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let db, auth, userId = null;
@@ -388,3 +395,4 @@
     </script>
 </body>
 </html>
+
