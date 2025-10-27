@@ -21,7 +21,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Driver ID</th>
+                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Driver Name</th>
                         <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle ID</th>
                         <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Defect Notes</th>
@@ -38,22 +38,22 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, query, limit, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global Variables
         const appId = 'eDVIR-App-Checklist';
         const statusMessage = document.getElementById('status-message');
 
-     // --- CRITICAL: PASTE YOUR FIREBASE CONFIGURATION HERE ---
-const firebaseConfig = {
-apiKey: "AIzaSyCWNSHd6957sh7XWrEZieVYX-a1J4KObAs",
-  authDomain: "edvir-tablet-app.firebaseapp.com",
-  projectId: "edvir-tablet-app",
-  storageBucket: "edvir-tablet-app.firebasestorage.app",
-  messagingSenderId: "189931329843",
-  appId: "1:189931329843:web:78d9884d4c47c0de384646"
-};
-// --------------------------------------------------------
+        // --- CRITICAL: YOUR FIREBASE CONFIGURATION (PRE-PATCHED) ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyCWNSHd6957sh7XWrEZieVYX-a1J4KObAs",
+          authDomain: "edvir-tablet-app.firebaseapp.com",
+          projectId: "edvir-tablet-app",
+          storageBucket: "edvir-tablet-app.firebasestorage.app",
+          messagingSenderId: "189931329843",
+          appId: "1:189931329843:web:78d9884d4c47c0de384646"
+        }; 
+        // --------------------------------------------------------
 
         let db, auth, userId = null;
 
@@ -64,10 +64,6 @@ apiKey: "AIzaSyCWNSHd6957sh7XWrEZieVYX-a1J4KObAs",
 
         async function initializeDashboard() {
             try {
-                if (!firebaseConfig.projectId) {
-                    throw new Error("Missing Firebase Config. Please insert keys.");
-                }
-
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
@@ -81,20 +77,25 @@ apiKey: "AIzaSyCWNSHd6957sh7XWrEZieVYX-a1J4KObAs",
 
             } catch (error) {
                 console.error("Dashboard Initialization Error:", error);
-                updateStatus(`Error connecting: ${error.message}`, 'error');
+                updateStatus(`CRITICAL CONFIGURATION ERROR: Failed to connect to database.`, 'error');
             }
         }
 
         function loadInspections() {
             const collectionPath = `artifacts/${appId}/public/data/inspections`;
-            
-            // Query: Get last 50 inspections, ordered by most recent (timestamp).
-            // NOTE: orderBy is used here, which might require an index in Firebase. If it errors, remove `orderBy` and sort in JS.
-         const q = collection(db, collectionPath);
-            
-            onSnapshot(q, (snapshot) => {
+            const inspectionsRef = collection(db, collectionPath); // Get the direct reference
+
+            // This is the simplest, most reliable way to retrieve data without index errors.
+            onSnapshot(inspectionsRef, (snapshot) => {
                 const tableBody = document.getElementById('inspection-table-body');
                 tableBody.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    updateStatus("No inspection records found in the database. Please submit a test inspection.", 'info');
+                    return;
+                }
+
+                updateStatus(`Successfully loaded ${snapshot.size} audit records.`, 'success');
                 
                 snapshot.forEach((doc) => {
                     const data = doc.data();
@@ -103,19 +104,20 @@ apiKey: "AIzaSyCWNSHd6957sh7XWrEZieVYX-a1J4KObAs",
                     const statusClass = data.overallStatus === 'Defect' ? 'bg-red-50 text-red-700 font-semibold' : 'text-gray-900';
                     const defectNotes = data.defectNotes || '—';
                     const time = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : 'N/A';
-                    const vehicleId = data.vehicleId || 'N/A'; // Capture the new field if present
+                    const vehicleId = data.vehicleId || 'N/A';
+                    const driverName = data.driverSignature || (data.userId ? data.userId.substring(0, 8) + '...' : 'Unknown');
 
                     row.className = statusClass;
                     
                     row.insertCell().textContent = time;
-                    row.insertCell().textContent = data.driverSignature || (data.userId ? data.userId.substring(0, 8) + '...' : 'Unknown');
+                    row.insertCell().textContent = driverName;
                     row.insertCell().textContent = vehicleId;
                     row.insertCell().textContent = data.overallStatus;
                     row.insertCell().textContent = defectNotes;
                 });
             }, (error) => {
                 console.error("Error retrieving data:", error);
-                updateStatus(`Error retrieving records: ${error.message}`, 'error');
+                updateStatus(`CRITICAL DATA ERROR: Check Firebase Rules.`, 'error');
             });
         }
 
@@ -126,7 +128,3 @@ apiKey: "AIzaSyCWNSHd6957sh7XWrEZieVYX-a1J4KObAs",
     </script>
 </body>
 </html>
-
-
-
-
