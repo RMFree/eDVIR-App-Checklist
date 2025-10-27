@@ -90,7 +90,7 @@ apiKey: "AIzaSyCWNSHd6957sh7XWrEZieVYX-a1J4KObAs",
             
             // Query: Get last 50 inspections, ordered by most recent (timestamp).
             // NOTE: orderBy is used here, which might require an index in Firebase. If it errors, remove `orderBy` and sort in JS.
-            const q = query(collection(db, collectionPath), orderBy("timestamp", "desc"), limit(50));
+         const q = query(collection(db, collectionPath), limit(50));
             
             onSnapshot(q, (snapshot) => {
                 const tableBody = document.getElementById('inspection-table-body');
@@ -126,5 +126,6 @@ apiKey: "AIzaSyCWNSHd6957sh7XWrEZieVYX-a1J4KObAs",
     </script>
 </body>
 </html>
+
 
 
