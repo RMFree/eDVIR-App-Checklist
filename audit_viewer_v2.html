@@ -41,8 +41,8 @@
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global Variables
-        const appId = 'eDVIR-App-Checklist';
-        const statusMessage = document.getElementById('status-message');
+        const appId = 'default-app-id'; // <-- NEW, CORRECT PATH
+const statusMessage = document.getElementById('status-message');
 
         // --- CRITICAL: YOUR FIREBASE CONFIGURATION (PRE-PATCHED) ---
         const firebaseConfig = {
@@ -128,3 +128,4 @@
     </script>
 </body>
 </html>
+
